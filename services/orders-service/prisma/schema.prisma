@@ -1,0 +1,48 @@
+// Prisma-схема сервиса заказов.
+// ВАЖНО: микросервисы не делят одну БД, поэтому заказ хранит СНИМОК товара
+// (productName, price на момент покупки) и НЕ имеет внешнего ключа на product.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Статусы жизненного цикла заказа
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  COOKING
+  DELIVERING
+  DONE
+  CANCELLED
+}
+
+// Заказ. userId опционален: заказ может оформить гость.
+model Order {
+  id           String      @id @default(cuid())
+  userId       String?
+  customerName String
+  phone        String
+  address      String
+  branch       String?
+  comment      String?
+  status       OrderStatus @default(NEW)
+  total        Int // итоговая сумма в копейках/минимальных единицах
+  items        OrderItem[]
+  createdAt    DateTime    @default(now())
+}
+
+// Позиция заказа — снимок товара из каталога на момент оформления.
+model OrderItem {
+  id          String @id @default(cuid())
+  order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  productId   String
+  productName String
+  price       Int // цена за единицу на момент покупки
+  quantity    Int
+}

@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package catalog;
+
+service CatalogService {
+  rpc GetMenu (Empty) returns (CategoriesResponse);
+  rpc GetProductsByIds (IdsRequest) returns (ProductsResponse);
+  rpc GetCategories (Empty) returns (CategoriesResponse);
+  rpc CreateProduct (CreateProductRequest) returns (Product);
+  rpc UpdateProduct (UpdateProductRequest) returns (Product);
+  rpc DeleteProduct (IdRequest) returns (OkResponse);
+}
+
+message Empty {}
+
+message IdRequest {
+  string id = 1;
+}
+
+message IdsRequest {
+  repeated string ids = 1;
+}
+
+message OkResponse {
+  bool ok = 1;
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string imageUrl = 5;
+  bool isAvailable = 6;
+  string categoryId = 7;
+}
+
+message Category {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  int32 sortOrder = 4;
+  repeated Product products = 5;
+}
+
+message CategoriesResponse {
+  repeated Category categories = 1;
+}
+
+message ProductsResponse {
+  repeated Product products = 1;
+}
+
+message CreateProductRequest {
+  string name = 1;
+  string description = 2;
+  int32 price = 3;
+  string imageUrl = 4;
+  string categoryId = 5;
+  bool isAvailable = 6;
+}
+
+// Обновление товара: передаются ВСЕ поля (proto3 не различает «не задано» и «дефолт»),
+// поэтому админ-форма всегда шлёт полный набор значений товара.
+message UpdateProductRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string imageUrl = 5;
+  string categoryId = 6;
+  bool isAvailable = 7;
+}

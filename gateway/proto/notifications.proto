@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package notifications;
+
+service NotificationsService {
+  // Отправить подтверждение успешного заказа клиенту.
+  rpc SendOrderConfirmation (OrderNotification) returns (NotifyResult);
+}
+
+message OrderNotification {
+  string orderId = 1;
+  string customerName = 2;
+  string phone = 3;
+  string email = 4;
+  int32 total = 5;
+  // Канал доставки: "email" | "sms" | "both".
+  // Если пусто — сервис сам выбирает по наличию email/phone.
+  string channel = 6;
+}
+
+message NotifyResult {
+  bool ok = 1;
+  // Подробности: какие каналы отработали, что упало.
+  string detail = 2;
+}

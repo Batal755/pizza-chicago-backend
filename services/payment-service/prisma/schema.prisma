@@ -1,0 +1,28 @@
+// Prisma-схема payment-service: платежи по заказам (интеграция ЮKassa)
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Статус платежа: ожидает оплаты / оплачен / отменён
+enum PaymentStatus {
+  pending
+  succeeded
+  canceled
+}
+
+// Платёж по заказу
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String
+  amount            Int // сумма в рублях (целое)
+  status            PaymentStatus @default(pending)
+  confirmationUrl   String? // ссылка на страницу оплаты у провайдера
+  providerPaymentId String? // id платежа на стороне ЮKassa
+  createdAt         DateTime      @default(now())
+}

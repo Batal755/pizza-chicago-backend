@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package orders;
+
+service OrdersService {
+  rpc Create (CreateOrderRequest) returns (Order);
+  rpc FindMy (UserRequest) returns (OrdersResponse);
+  rpc FindAll (FindAllRequest) returns (OrdersResponse);
+  rpc UpdateStatus (UpdateStatusRequest) returns (Order);
+}
+
+message OrderItemInput {
+  string productId = 1;
+  int32 quantity = 2;
+}
+
+message CreateOrderRequest {
+  string customerName = 1;
+  string phone = 2;
+  string address = 3;
+  string branch = 4;
+  string comment = 5;
+  string email = 6;
+  repeated OrderItemInput items = 7;
+  string userId = 8;
+}
+
+message UserRequest {
+  string userId = 1;
+}
+
+message FindAllRequest {
+  string status = 1;
+}
+
+message UpdateStatusRequest {
+  string id = 1;
+  string status = 2;
+}
+
+message OrderItem {
+  string id = 1;
+  string productId = 2;
+  string productName = 3;
+  int32 price = 4;
+  int32 quantity = 5;
+}
+
+message Order {
+  string id = 1;
+  string userId = 2;
+  string customerName = 3;
+  string phone = 4;
+  string address = 5;
+  string branch = 6;
+  string comment = 7;
+  string status = 8;
+  int32 total = 9;
+  repeated OrderItem items = 10;
+  string createdAt = 11;
+}
+
+message OrdersResponse {
+  repeated Order orders = 1;
+}

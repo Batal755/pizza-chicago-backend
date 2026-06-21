@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package support;
+
+service SupportService {
+  rpc Create (CreateTicketRequest) returns (Ticket);
+  rpc List (Empty) returns (TicketsResponse);
+  rpc Close (IdRequest) returns (Ticket);
+}
+
+message Empty {}
+
+message IdRequest {
+  string id = 1;
+}
+
+message CreateTicketRequest {
+  string name = 1;
+  string contact = 2;
+  string message = 3;
+  string userId = 4;
+}
+
+message Ticket {
+  string id = 1;
+  string userId = 2;
+  string name = 3;
+  string contact = 4;
+  string message = 5;
+  string status = 6;
+  string createdAt = 7;
+}
+
+message TicketsResponse {
+  repeated Ticket tickets = 1;
+}

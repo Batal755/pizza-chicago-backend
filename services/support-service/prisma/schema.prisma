@@ -1,0 +1,27 @@
+// Prisma-схема support-service: обращения в поддержку с сайта
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Статус обращения в поддержку
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+// Обращение пользователя в поддержку
+model SupportTicket {
+  id        String       @id @default(cuid())
+  userId    String?
+  name      String
+  contact   String
+  message   String
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+}

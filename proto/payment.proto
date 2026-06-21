@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package payment;
+
+service PaymentService {
+  // Создать платёж по заказу. Возвращает ссылку на оплату (confirmationUrl).
+  rpc CreatePayment (CreatePaymentRequest) returns (Payment);
+  // Подтвердить платёж (вызывается после вебхука провайдера).
+  rpc ConfirmPayment (ConfirmRequest) returns (Payment);
+  // Получить платёж по id или по orderId.
+  rpc GetPayment (GetPaymentRequest) returns (Payment);
+}
+
+message CreatePaymentRequest {
+  string orderId = 1;
+  int32 amount = 2;
+  string returnUrl = 3;
+}
+
+message ConfirmRequest {
+  // id платежа в нашей системе ИЛИ id платежа провайдера (одно из).
+  string paymentId = 1;
+  string providerPaymentId = 2;
+}
+
+message GetPaymentRequest {
+  string id = 1;
+  string orderId = 2;
+}
+
+message Payment {
+  string id = 1;
+  string orderId = 2;
+  int32 amount = 3;
+  // pending | succeeded | canceled
+  string status = 4;
+  string confirmationUrl = 5;
+  string providerPaymentId = 6;
+  string createdAt = 7;
+}

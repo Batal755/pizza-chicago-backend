@@ -1,7 +1,7 @@
 // Контроллер каталога: обрабатывает gRPC-вызовы CatalogService.
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { Category, Product } from '@prisma/client';
+import { Category, Product } from '../generated/prisma/client';
 import { CatalogService } from './catalog.service';
 import { CreateProductDto } from './dto/create-product.dto';
 

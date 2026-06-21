@@ -1,7 +1,6 @@
 // Unit-тесты SupportService: мок PrismaService. Реальная БД не используется.
 import { Test, TestingModule } from '@nestjs/testing';
 import { RpcException } from '@nestjs/microservices';
-import { Prisma, TicketStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SupportService } from './support.service';
 
@@ -78,7 +77,7 @@ describe('SupportService', () => {
 
   describe('close', () => {
     it('закрывает обращение -> status CLOSED', async () => {
-      const closed = { id: 't1', status: TicketStatus.CLOSED };
+      const closed = { id: 't1', status: 'CLOSED' };
       prisma.supportTicket.update.mockResolvedValue(closed);
 
       const result = await service.close('t1');
@@ -86,15 +85,12 @@ describe('SupportService', () => {
       expect(result).toBe(closed);
       expect(prisma.supportTicket.update).toHaveBeenCalledWith({
         where: { id: 't1' },
-        data: { status: TicketStatus.CLOSED },
+        data: { status: 'CLOSED' },
       });
     });
 
     it('P2025 (не найдено) -> RpcException', async () => {
-      const notFound = new Prisma.PrismaClientKnownRequestError('Not found', {
-        code: 'P2025',
-        clientVersion: '5.22.0',
-      });
+      const notFound = Object.assign(new Error('Not found'), { code: 'P2025' });
       prisma.supportTicket.update.mockRejectedValue(notFound);
 
       await expect(service.close('missing')).rejects.toBeInstanceOf(RpcException);

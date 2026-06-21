@@ -4,13 +4,16 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
-import { Prisma, Role, User } from '@prisma/client';
+import type { User } from '../generated/prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto, RefreshDto, RegisterDto } from './dto/auth.dto';
 
 // Стоимость хеширования bcrypt
 const BCRYPT_COST = 12;
+
+// Роль пользователя (строковые литералы вместо enum из @prisma/client)
+type Role = 'CUSTOMER' | 'ADMIN';
 
 // Безопасное представление пользователя (без passwordHash)
 interface PublicUser {
@@ -60,11 +63,11 @@ export class AuthService {
       });
     } catch (error) {
       // P2002 — нарушение уникальности (телефон или email уже заняты)
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        const target = (error.meta?.target as string[] | undefined) ?? [];
+      if ((error as { code?: string }).code === 'P2002') {
+        const target =
+          ((error as { meta?: { target?: string[] } }).meta?.target as
+            | string[]
+            | undefined) ?? [];
         if (target.includes('email')) {
           throw new RpcException({
             code: status.ALREADY_EXISTS,

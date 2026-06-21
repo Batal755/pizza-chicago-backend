@@ -1,7 +1,6 @@
 // Unit-тесты CatalogService: мок PrismaService. Реальная БД не используется.
 import { Test, TestingModule } from '@nestjs/testing';
 import { RpcException } from '@nestjs/microservices';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CatalogService } from './catalog.service';
 
@@ -144,10 +143,7 @@ describe('CatalogService', () => {
     });
 
     it('P2025 (не найден) -> RpcException', async () => {
-      const notFound = new Prisma.PrismaClientKnownRequestError('Not found', {
-        code: 'P2025',
-        clientVersion: '5.22.0',
-      });
+      const notFound = Object.assign(new Error('Not found'), { code: 'P2025' });
       prisma.product.update.mockRejectedValue(notFound);
 
       await expect(
@@ -174,10 +170,7 @@ describe('CatalogService', () => {
     });
 
     it('P2025 (не найден) -> RpcException', async () => {
-      const notFound = new Prisma.PrismaClientKnownRequestError('Not found', {
-        code: 'P2025',
-        clientVersion: '5.22.0',
-      });
+      const notFound = Object.assign(new Error('Not found'), { code: 'P2025' });
       prisma.product.delete.mockRejectedValue(notFound);
 
       await expect(service.deleteProduct('missing')).rejects.toBeInstanceOf(

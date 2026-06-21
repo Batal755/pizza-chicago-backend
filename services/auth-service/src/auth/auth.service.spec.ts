@@ -4,7 +4,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
-import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from './auth.service';
@@ -92,7 +91,7 @@ describe('AuthService', () => {
         phone: '+79991234567',
         role: 'CUSTOMER',
       });
-      expect((result.user as Record<string, unknown>).passwordHash).toBeUndefined();
+      expect((result.user as unknown as Record<string, unknown>).passwordHash).toBeUndefined();
       // Токены сгенерированы.
       expect(result.tokens).toEqual({
         accessToken: 'access-token',
@@ -103,11 +102,11 @@ describe('AuthService', () => {
     it('дубликат телефона (P2002) -> RpcException', async () => {
       jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashed' as never);
 
-      // Конструируем реальную ошибку Prisma, иначе instanceof не сработает.
-      const dupError = new Prisma.PrismaClientKnownRequestError(
-        'Unique constraint failed',
-        { code: 'P2002', clientVersion: '5.22.0', meta: { target: ['phone'] } },
-      );
+      // Ошибка нарушения уникальности: распознаётся по коду P2002.
+      const dupError = Object.assign(new Error('Unique constraint failed'), {
+        code: 'P2002',
+        meta: { target: ['phone'] },
+      });
       prisma.user.create.mockRejectedValue(dupError);
 
       await expect(
@@ -167,7 +166,7 @@ describe('AuthService', () => {
         phone: '+79991234567',
         role: 'CUSTOMER',
       });
-      expect((result.user as Record<string, unknown>).passwordHash).toBeUndefined();
+      expect((result.user as unknown as Record<string, unknown>).passwordHash).toBeUndefined();
       expect(result.tokens).toEqual({
         accessToken: 'access-token',
         refreshToken: 'refresh-token',

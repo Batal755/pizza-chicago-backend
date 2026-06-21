@@ -1,0 +1,10 @@
+{
+  "name": "pizza-chicago-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pizza Chicago — серверная часть: API-шлюз + микросервисы (NestJS, gRPC, Prisma 7, PostgreSQL)",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "node scripts/dev.mjs"
+  }
+}

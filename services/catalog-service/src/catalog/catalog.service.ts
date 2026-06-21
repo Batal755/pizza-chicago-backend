@@ -1,6 +1,6 @@
 // Бизнес-логика каталога: чтение меню и товаров из базы.
 import { Injectable } from '@nestjs/common';
-import { Prisma, Category, Product } from '@prisma/client';
+import { Category, Product } from '../generated/prisma/client';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { PrismaService } from '../prisma/prisma.service';
@@ -87,10 +87,7 @@ export class CatalogService {
       });
     } catch (error) {
       // P2025 — запись для обновления не найдена
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
+      if ((error as { code?: string }).code === 'P2025') {
         throw new RpcException({
           code: status.NOT_FOUND,
           message: 'Товар не найден',
@@ -109,10 +106,7 @@ export class CatalogService {
       return { ok: true };
     } catch (error) {
       // P2025 — запись для удаления не найдена
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
+      if ((error as { code?: string }).code === 'P2025') {
         throw new RpcException({
           code: status.NOT_FOUND,
           message: 'Товар не найден',

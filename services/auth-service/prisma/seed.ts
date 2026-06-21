@@ -1,8 +1,13 @@
 // Сид базы данных: создаёт администратора по умолчанию через upsert.
-import { PrismaClient, Role } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../src/generated/prisma/client';
 import * as bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+const connectionString =
+  process.env.DATABASE_URL ??
+  'postgresql://pizza:pizza@localhost:5432/auth_db?schema=public';
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
 // Стоимость хеширования bcrypt (как и в сервисе аутентификации)
 const BCRYPT_COST = 12;
@@ -20,7 +25,7 @@ async function main(): Promise<void> {
       name: 'Администратор',
       phone,
       passwordHash,
-      role: Role.ADMIN,
+      role: 'ADMIN',
     },
   });
 

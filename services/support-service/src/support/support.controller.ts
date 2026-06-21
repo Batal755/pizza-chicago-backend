@@ -1,7 +1,7 @@
 // gRPC-контроллер support-service (service SupportService из support.proto).
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { SupportTicket } from '@prisma/client';
+import { SupportTicket } from '../generated/prisma/client';
 import { SupportService } from './support.service';
 
 // Входящие данные rpc Create (CreateTicketRequest); userId — proto3 string ('' = гость)

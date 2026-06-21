@@ -19,42 +19,53 @@
 - **База:** PostgreSQL, отдельная база данных на каждый сервис (кроме notifications)
 - **Контракты gRPC:** `proto/*.proto`
 
-## Быстрый старт (одна команда)
+## Быстрый старт (кросс-платформенно: Windows / macOS / Linux)
 
-Нужны **Node.js 20+** и **Docker**.
+Нужны **Node.js 20.19+ / 22.12+ / 24+** (требование Prisma 7) и **Docker**.
 
 ```bash
-./scripts/setup.sh    # поднимает базу, ставит зависимости, создаёт схемы и меню
-./scripts/dev.sh      # запускает всё: 4 сервиса + шлюз + сайт
+npm run setup    # БД + .env + зависимости + Prisma-клиент + схемы + меню
+npm run dev      # запускает весь бэкенд: 6 сервисов + шлюз
 ```
 
-Открыть сайт: **http://localhost:3000**
+Фронтенд — в отдельном репозитории `pizza-chicago-frontend` (там `npm install && npm run dev`).
 
-Тестовый администратор: телефон `+79285660909`, пароль `admin123`.
+Шлюз: **http://localhost:4000/api**. Тестовый админ: `+79285660909` / `admin123`.
+
+> На macOS/Linux есть и bash-аналоги: `./scripts/setup.sh`, `./scripts/dev.sh`.
+> На Windows используйте именно `npm run setup` / `npm run dev`.
+
+## Prisma 7
+
+Сервисы с БД используют **Prisma 7**: новый генератор `prisma-client` (клиент генерируется
+в `src/generated/prisma`, в гите не хранится), драйвер-адаптер `@prisma/adapter-pg`,
+конфиг в `prisma.config.ts`. Поэтому **перед первым запуском обязательно** `npm run setup`
+(он делает `prisma generate`) — иначе сборка не найдёт сгенерированный клиент.
 
 ## Запуск вручную (по шагам)
 
 ```bash
-# 1. База данных (создаёт 4 базы: auth_db, catalog_db, orders_db, support_db)
+# 1. База данных (создаёт базы: auth_db, catalog_db, orders_db, support_db, payment_db)
 docker compose up -d
 
-# 2. В каждом пакете (services/*, gateway, web):
+# 2. В каждом пакете (services/*, gateway):
 cp .env.example .env
 npm install
 
-# 3. Схемы и наполнение (в каждом сервисе):
-npx prisma generate && npx prisma db push
+# 3. Схема + клиент (в каждом сервисе с БД):
+npm run prisma:generate && npm run db:push
 # меню и админ:
 cd services/catalog-service && npm run prisma:seed
 cd services/auth-service    && npm run prisma:seed
 
-# 4. Запуск (каждый в своём терминале):
-cd services/auth-service && npm run start:dev      # TCP 4001
-cd services/catalog-service && npm run start:dev   # TCP 4002
-cd services/orders-service && npm run start:dev    # TCP 4003
-cd services/support-service && npm run start:dev   # TCP 4004
+# 4. Запуск (каждый в своём терминале), gRPC-порты 50051..50056:
+cd services/auth-service && npm run start:dev
+cd services/catalog-service && npm run start:dev
+cd services/orders-service && npm run start:dev
+cd services/support-service && npm run start:dev
+cd services/notifications-service && npm run start:dev
+cd services/payment-service && npm run start:dev
 cd gateway && npm run start:dev                    # HTTP 4000
-cd web && npm run dev                              # http://localhost:3000
 ```
 
 ## Структура

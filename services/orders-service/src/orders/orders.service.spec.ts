@@ -2,7 +2,6 @@
 // КЛЮЧЕВОЕ: total считается по ценам ИЗ каталога, а не из dto.
 import { Test, TestingModule } from '@nestjs/testing';
 import { RpcException } from '@nestjs/microservices';
-import { Prisma } from '@prisma/client';
 import { of, throwError } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrdersService } from './orders.service';
@@ -199,9 +198,8 @@ describe('OrdersService', () => {
     });
 
     it('P2025 (заказ не найден) -> RpcException', async () => {
-      const notFound = new Prisma.PrismaClientKnownRequestError('Not found', {
+      const notFound = Object.assign(new Error('Not found'), {
         code: 'P2025',
-        clientVersion: '5.22.0',
       });
       prisma.order.update.mockRejectedValue(notFound);
 

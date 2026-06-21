@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { OrderStatus } from '@prisma/client';
+import type { OrderStatus } from '../generated/prisma/client';
 import { OrdersService, CreateOrderData } from './orders.service';
 
 // Форма позиции заказа из БД (Prisma OrderItem).

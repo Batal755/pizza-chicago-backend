@@ -3,12 +3,12 @@
 // (productName, price на момент покупки) и НЕ имеет внешнего ключа на product.
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Статусы жизненного цикла заказа

@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
-import { Prisma, OrderStatus } from '@prisma/client';
+import type { OrderStatus } from '../generated/prisma/client';
 import { firstValueFrom, Observable } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -177,8 +177,10 @@ export class OrdersService implements OnModuleInit {
     } catch (error) {
       // P2025 — заказ для обновления не найден
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        (error as { code?: string }).code === 'P2025'
       ) {
         throw new RpcException({
           code: status.NOT_FOUND,

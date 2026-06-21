@@ -1,9 +1,9 @@
 // Сервис поддержки: бизнес-логика работы с обращениями.
 import { Injectable } from '@nestjs/common';
-import { Prisma, SupportTicket, TicketStatus } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { PrismaService } from '../prisma/prisma.service';
+import { SupportTicket } from '../generated/prisma/client';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 
 @Injectable()
@@ -36,13 +36,15 @@ export class SupportService {
     try {
       return await this.prisma.supportTicket.update({
         where: { id },
-        data: { status: TicketStatus.CLOSED },
+        data: { status: 'CLOSED' },
       });
     } catch (error) {
       // P2025 — обращение для обновления не найдено
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        (error as { code?: string }).code === 'P2025'
       ) {
         throw new RpcException({
           code: status.NOT_FOUND,

@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
-import { Payment } from '@prisma/client';
+import { Payment } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   ConfirmRequest,
